@@ -5,9 +5,10 @@ let buttonWidth = 400;
 let buttonHeight = 100;
 let x = 500, y = 700; // Initial position of the fairy
 
+let monsterHealth =15; 
 let littleMonsters = [];
 let lastSpawnTime = 0; // Tracks the last spawn time for little monsters
-let spawnInterval = 5000; // Spawn every 5 seconds
+let spawnInterval = 3500; // Spawn every 5 seconds
 
 let winCondition = false; // Tracks if the player has won
 
@@ -26,7 +27,7 @@ let thrustingRight = false;
 
 // Projectiles arrays
 let projectiles = [] ; 
-let monsterBullets = [];
+
 
 //Little monster 
 let lilMonsterX = 350, lilMonsterY = 60;
@@ -36,13 +37,13 @@ let monsterHit = false;
 let hitTimer = 0; // Timer for the flashing animation
 let flashColor = [255, 0, 0]; // Initial monster color (red)
 
-// Monster shooting variables
-let monsterShootInterval = 2500; // 2.5 seconds
-let lastMonsterShotTime = 0;
+
+
+
 
 // Reload variables
 let canShoot = true; // Flag to check if the fairy can shoot
-let reloadTimer = 1000; // 1 seconds reload time in milliseconds
+let reloadTimer = 500; // 0.5 seconds reload time in milliseconds
 let lastShotTime = 0; // Last shot time to track reload
 
 function setup() {
@@ -58,7 +59,7 @@ function draw() {
         endScreen();
     }
 }
-
+window.setup = setup;
 function startScreen() {
     background(0, 0, 0);
     fill(255, 255, 255);
@@ -66,10 +67,10 @@ function startScreen() {
     text("Fairy the Fighter", 250, 380);
     //instruction text 
     textSize(20);
-      text("You should hit the monster for 10 times to win", width / 3.5, height / 1.4);
+      text("You should hit the monster for 15 times to win", width / 3.5, height / 1.4);
       text("Use LEFT and RIGHT arrow keys to move", width / 3.5, height / 1.5);
-      text("Avoid enemy bullets and destroy little monsters", width / 3.5, height / 1.3);
-      text("The far you go the wrong distance shotting you have", width / 3.5 , height / 1.21);
+      text("The far you go the wrong distance shotting you have", width / 3.5, height / 1.3);
+      
 
     // Draw a button
     fill(255);
@@ -83,19 +84,19 @@ function gameScreen() {
    gameBackground();
     let moved = false; // Flag to check if the fairy moved
     if (thrustingLeft){
-        x  -=8 * scaleFactor;
+        x  -=8;
         moved = true;
     }
 
     if (thrustingRight){
-        x  +=8  * scaleFactor;
+        x  +=8;
         moved = true;
     }
     if (moved) {
         lastMoveTime = millis();
     }
     if (millis() - lastMoveTime > maxIdleTime) {
-       // gameState = "end"; // End game if idle for too long
+        gameState = "end"; // End game if idle for too long
     }
     // **Spawn little monsters periodically**
     if (millis() - lastSpawnTime >= spawnInterval) {
@@ -115,19 +116,10 @@ function gameScreen() {
     }
 }    
     
-
-
-
-
-    
-
     x = constrain(x, 0, width); // Keep fairy within canvas bounds
-
-  
 
     drawFairy(x+20, y + 90);
     
-
     if (monsterHit) {
         flashColor = flashColor[0] === 255 ? [255, 255, 200] : [255, 0, 0]; // Toggle color
         hitTimer--;
@@ -139,34 +131,7 @@ function gameScreen() {
 
     drawMonster(monsterX, monsterY, flashColor);
 
-    // Monster shoots bullets every 2 seconds
-    if (millis() - lastMonsterShotTime >= monsterShootInterval) {
-        shootMonsterBullets();
-        lastMonsterShotTime = millis();
-    }
-
-    // Update and draw monster bullets
-    for (let i = monsterBullets.length - 1; i >= 0; i--) {
-        let bullet = monsterBullets[i];
-        bullet.x += bullet.vx;
-        bullet.y += bullet.vy;
-
-        fill(0, 255, 0); // Green for monster bullets
-        ellipse(bullet.x, bullet.y, 20, 20);
-
-        // Check collision with fairy
-        
-        
-        // Remove bullet if off-screen
-        if (bullet.x < 0 || bullet.x > width || bullet.y > height) {
-            monsterBullets.splice(i, 1);
-        }
-    }
-    // check  the fairy 
-    
-
-    
-    // Draw and update projectiles
+    // Draw and update the fairy 's projectiles
     for (let i = projectiles.length -  1; i >= 0; i--) {
         let p = projectiles[i];
         p.y -= 10; // Move the projectile up
@@ -187,7 +152,7 @@ function gameScreen() {
             projectiles.splice(i, 1); // Remove projectile
             monsterHitCount++; // Increase the hit count
 
-            if (monsterHitCount >= 10) {
+            if (monsterHitCount >= monsterHealth) {
                 winCondition = true;
                 gameState = "end";
                 return; // Stop the game logic here
@@ -224,7 +189,7 @@ function endScreen() {
     background(0);
     fill(255);
     textSize(50);
-    if (monsterHitCount >= 10) {
+    if (monsterHitCount >= monsterHealth) {
         winCondition = true; // Set win condition
         text("You Win!", width / 2 - 100, height / 3);
     } else {
@@ -258,7 +223,7 @@ function drawLittleMonster(lilMonsterX, lilMonsterY) {
 
 // **Spawn multiple little monsters**
 function spawnLittleMonsters() {
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 3; i++) {
         littleMonsters.push({
             x: random(50, width - 50),
             y: random(50, height / 2), // Spawn from the top half
