@@ -46,7 +46,7 @@ let reloadTimer = 1000; // 1 seconds reload time in milliseconds
 let lastShotTime = 0; // Last shot time to track reload
 
 function setup() {
-    createCanvas(1100, 1100);
+    createCanvas(1000, 1100);
 }
 
 function draw() {
